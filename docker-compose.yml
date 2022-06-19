@@ -1,0 +1,28 @@
+version: '3'
+services:
+  app:
+    build:
+      context: app
+    environment:
+      DATABASE_URL: 'postgresql://databaseuser:supersecretdbpassword@db:5432/app'
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: 'supersecretredispassword'
+    volumes:
+      - ./app:/app
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: 'databaseuser'
+      POSTGRES_PASSWORD: 'supersecretdbpassword'
+      POSTGRES_DB: 'app'
+
+  redis:
+    image: redis:latest
+    command: redis-server --requirepass 'supersecretredispassword'
