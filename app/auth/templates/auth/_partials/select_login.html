@@ -47,7 +47,7 @@
         const verificationJSON = await verificationResp.json();
 
         if (verificationJSON && verificationJSON.verified) {
-            alert("Login succeeded.")
+            window.location.replace(verificationJSON.next);
         } else {
             alert("login failed")
             console.error(verificationJSON)

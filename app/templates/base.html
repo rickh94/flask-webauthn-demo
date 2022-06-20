@@ -25,13 +25,21 @@
 <header class="w-full bg-gray-50 font-bold px-8 py-2 flex justify-between shadow items-center">
   <a href="{{ url_for('index') }}" class="font-bold text-2xl">WebAuthn Flask</a>
   <nav class="flex justify-end space-x-4 items-center">
-    <!-- We'll come back and fill in the actual links later -->
+    {% if current_user.is_authenticated %}
+      <div>
+        <a href="{{ url_for('auth.user_profile') }}" class="hover:underline font-bold text-xl">Profile</a>
+      </div>
+      <div>
+        <a href="{{ url_for('auth.logout') }}" class="hover:underline font-bold text-xl">Logout</a>
+      </div>
+    {% else %}
     <div>
       <a href="{{ url_for('auth.login') }}" class="hover:underline font-bold text-xl">Login</a>
     </div>
     <div>
       <a href="{{ url_for('auth.register') }}" class="hover:underline font-bold text-xl">Register</a>
     </div>
+    {% endif %}
   </nav>
 </header>
 

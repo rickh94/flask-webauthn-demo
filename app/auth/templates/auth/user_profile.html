@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="flex flex-col space-y-4">
+    <h4 class="font-bold text-2xl">User Profile Information</h4>
+    <div>
+      <strong class="font-bold">Name:</strong> {{ current_user.name }}
+    </div>
+    <div>
+      <strong class="font-bold">Username:</strong> {{ current_user.username }}
+    </div>
+    <div>
+      <strong class="font-bold">Email:</strong> {{ current_user.email }}
+    </div>
+    <div>
+      <strong class="font-bold">UID:</strong> {{ current_user.uid }}
+    </div>
+    <div>
+      <strong class="font-bold">Registered
+        Credentials:</strong> {{ current_user.credentials | length }}
+    </div>
+  </div>
+{% endblock content %}
