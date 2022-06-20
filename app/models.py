@@ -20,7 +20,7 @@ class User(db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False)
     credentials = db.relationship(
         "WebAuthnCredential",
-        backref=backref("user", cascade="all, delete-orphans"),
+        backref=backref("user", cascade="all, delete"),
         lazy=True,
     )
 
