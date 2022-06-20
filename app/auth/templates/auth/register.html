@@ -2,50 +2,7 @@
 {% block content %}
   <div>
     <div class="max-w-2xl mx-auto">
-      <form action="{{ url_for('auth.create_user') }}" method="POST" class="flex-col max-w-sm mx-auto space-y-2">
-        <h4 class="text-2xl font-bold">Register</h4>
-        <p class="italic text-base">
-          Create your user account below. We will set up authentication in the next
-          step.
-        </p>
-        <div class="flex-col flex mt-2">
-          <label for="name" class="mb-1 font-bold">Name</label>
-          <input
-            type="text"
-            name="name"
-            id="name"
-            class="border border-black rounded shadow p-1"
-          >
-        </div>
-        <div class="flex-col flex mt-2">
-          <label for="username" class="mb-1 font-bold">Username</label>
-          <input
-            type="text"
-            name="username"
-            id="username"
-            class="border border-black rounded shadow p-1"
-            required
-          >
-        </div>
-        <div class="flex-col flex mt-2">
-          <label for="email" class="mb-1 font-bold">Email</label>
-          <input
-            type="email"
-            name="email"
-            id="email"
-            class="border border-black rounded shadow p-1"
-            required
-          >
-        </div>
-        <div>
-          <button
-            class="bg-green-600 font-bold py-2 px-4 uppercase shadow text-white rounded hover:bg-green-700 hover:shadow-lg"
-            type="submit"
-          >
-            Register
-          </button>
-        </div>
-      </form>
+      {% include "auth/_partials/user_creation_form.html" %}
     </div>
   </div>
 {% endblock content %}
