@@ -1,0 +1,56 @@
+<h1 class="font-bold text-xl">Hello, {{ username }}</h1>
+<p class="my-2">
+  If you have logged in on this device before, you may be able to use a
+  biometric method (Fingerprint Reader or Facial Recognition) or a security key.
+</p>
+<p class="my-2">
+  If you haven't logged in on this device before (or your device doesn't support
+  biometrics, choose email login. Then you can set up biometric authentication to
+  use in the future.
+</p>
+<div class="flex space-x-2">
+  <button
+    class="text-white uppercase font-bold bg-green-600 px-4 py-2 rounded"
+    id="start-login"
+  >
+    Device Login
+  </button>
+  <a
+    href="{{ url_for('auth.login_switch_user') }}"
+    class="text-white uppercase font-bold bg-black px-4 py-2 rounded"
+  >
+    Switch User
+  </a>
+</div>
+
+<script>
+    document.getElementById('start-login').addEventListener('click', async () => {
+        // The auth_options dictionary is also a valid javascript object, so it can be injected here.
+        const options = {{ auth_options | safe }};
+
+        let asseResp;
+        try {
+            asseResp = await startAuthentication(options);
+        } catch (error) {
+            alert("Something went wrong");
+            console.error(error)
+        }
+
+        const verificationResp = await fetch('{{ url_for("auth.verify_login_credential") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(asseResp),
+        })
+
+        const verificationJSON = await verificationResp.json();
+
+        if (verificationJSON && verificationJSON.verified) {
+            alert("Login succeeded.")
+        } else {
+            alert("login failed")
+            console.error(verificationJSON)
+        }
+    })
+</script>

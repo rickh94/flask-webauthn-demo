@@ -1,0 +1,24 @@
+<form hx-post="{{ url_for('auth.prepare_login') }}" hx-swap="outerHTML" class="max-w-sm mx-auto space-y-2">
+  <h1 class="text-xl font-bold mb-2">Login</h1>
+  <p class="italic">Enter your username or email address to start logging in.</p>
+  {% if error %}
+    <p class="text-red-700 font-bold">{{ error }}</p>
+  {% endif %}
+  <div class="flex-col flex">
+    <label for="username" class="mb-1 font-bold">Username or Email</label>
+    <input
+      type="text"
+      id="username_email"
+      name="username_email"
+      required
+      class="border border-black rounded shadow p-1"
+    >
+  </div>
+  <div>
+    <button
+      class="bg-green-600 font-bold py-2 px-4 uppercase shadow text-white rounded hover:bg-green-700 hover:shadow-lg"
+      type="submit"
+    >Start Login
+    </button>
+  </div>
+</form>

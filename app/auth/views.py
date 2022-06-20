@@ -1,7 +1,16 @@
-from flask import Blueprint, render_template, request, make_response, session, abort
+import datetime
+
+from flask import (
+    Blueprint, render_template, request, make_response, session, abort,
+    url_for, redirect,
+)
+from sqlalchemy import or_, func
 from sqlalchemy.exc import IntegrityError
-from webauthn.helpers.exceptions import InvalidRegistrationResponse
-from webauthn.helpers.structs import RegistrationCredential
+from webauthn.helpers.exceptions import (
+    InvalidRegistrationResponse,
+    InvalidAuthenticationResponse,
+)
+from webauthn.helpers.structs import RegistrationCredential, AuthenticationCredential
 
 from auth import security
 from models import User, db
@@ -58,11 +67,102 @@ def add_credential():
     try:
         security.verify_and_save_credential(user, registration_credential)
         session["registration_user_uid"] = None
-        return make_response('{"verified": true}', 201)
+        res = make_response('{"verified": true}', 201)
+        res.set_cookie(
+            "user_uid",
+            user.uid,
+            httponly=True,
+            secure=True,
+            samesite="strict",
+            max_age=datetime.timedelta(days=30),
+        )
+        return res
     except InvalidRegistrationResponse:
         abort(make_response('{"verified": false}', 400))
 
 
-@auth.route("/login")
+@auth.route("/login", methods=["GET"])
 def login():
-    return "Login user"
+    """Prepare to log in the user with biometric authentication"""
+    user_uid = request.cookies.get("user_uid")
+    user = User.query.filter_by(uid=user_uid).first()
+
+    # If the user is not remembered from a previous session, we'll need to get
+    # their username.
+    if not user:
+        return render_template("auth/login.html", username=None, auth_options=None)
+
+    # If they are remembered, we can skip directly to biometrics.
+    auth_options = security.prepare_login_with_credential(user)
+
+    # Set the user uid on the session to get when we are authenticating
+    session["login_user_uid"] = user.uid
+    return render_template(
+        "auth/login.html", username=user.username, auth_options=auth_options
+    )
+
+
+@auth.route("/prepare-login", methods=["POST"])
+def prepare_login():
+    """Prepare login options for a user based on their username or email"""
+    username_or_email = request.form.get("username_email", "").lower()
+    # The lower function just does case insensitivity for our.
+    user = User.query.filter(
+        or_(
+            func.lower(User.username) == username_or_email,
+            func.lower(User.email) == username_or_email,
+        )
+    ).first()
+
+    # if no user matches, send back the form with an error message
+    if not user:
+        return render_template(
+            "auth/_partials/username_form.html", error="No matching user found"
+        )
+
+    auth_options = security.prepare_login_with_credential(user)
+
+    res = make_response(
+        render_template(
+            "auth/_partials/select_login.html",
+            auth_options=auth_options,
+            username=user.username,
+        )
+    )
+
+    # set the user uid on the session to get when we are authenticating later.
+    session["login_user_uid"] = user.uid
+    res.set_cookie(
+        "user_uid",
+        user.uid,
+        httponly=True,
+        secure=True,
+        samesite="strict",
+        max_age=datetime.timedelta(days=30),
+    )
+    return res
+
+
+@auth.route("/login-switch-user")
+def login_switch_user():
+    """Remove a remembered user and show the username form again."""
+    session["login_user_uid"] = None
+    res = make_response(redirect(url_for('auth.login')))
+    res.delete_cookie('user_uid')
+    return res
+
+
+@auth.route("/verify-login-credential", methods=["POST"])
+def verify_login_credential():
+    """Log in a user with a submitted credential"""
+    user_uid = session.get("login_user_uid")
+    user = User.query.filter_by(uid=user_uid).first()
+    if not user:
+        abort(make_response('{"verified": false}', 400))
+
+    authentication_credential = AuthenticationCredential.parse_raw(request.get_data())
+    try:
+        security.verify_authentication_credential(user, authentication_credential)
+        return make_response('{"verified": true}')
+    except InvalidAuthenticationResponse:
+        abort(make_response('{"verified": false}', 400))

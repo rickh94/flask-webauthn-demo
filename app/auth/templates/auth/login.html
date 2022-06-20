@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% if auth_options %}
+    {% include "auth/_partials/select_login.html" %}
+  {% else %}
+    {% include "auth/_partials/username_form.html" %}
+  {% endif %}
+{% endblock %}
