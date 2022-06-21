@@ -9,6 +9,15 @@
   use in the future.
 </p>
 <div class="flex space-x-2">
+    <a
+    hx-get="{{ url_for('auth.email_login') }}"
+    hx-target="#page-content"
+    hx-swap="innerHTML"
+    class="text-white uppercase font-bold bg-orange-600 cursor-pointer px-4 py-2 rounded"
+  >
+    Email Login
+  </a>
+
   <button
     class="text-white uppercase font-bold bg-green-600 px-4 py-2 rounded"
     id="start-login"

@@ -50,6 +50,8 @@ def create_user():
         )
 
     login_user(user)
+    session['used_webauthn'] = False
+
     pcco_json = security.prepare_credential_creation(user)
     return make_response(
         render_template(
@@ -66,7 +68,8 @@ def add_credential():
     registration_credential = RegistrationCredential.parse_raw(request.get_data())
     try:
         security.verify_and_save_credential(current_user, registration_credential)
-        session["registration_user_uid"] = None
+        session['used_webauthn'] = True
+
         res = util.make_json_response(
             {"verified": True, "next": url_for("auth.user_profile")}
         )
@@ -148,7 +151,7 @@ def prepare_login():
 @auth.route("/login-switch-user")
 def login_switch_user():
     """Remove a remembered user and show the username form again."""
-    session["login_user_uid"] = None
+    session.pop("login_user_uid", None)
     res = make_response(redirect(url_for("auth.login")))
     res.delete_cookie("user_uid")
     return res
@@ -166,6 +169,7 @@ def verify_login_credential():
     try:
         security.verify_authentication_credential(user, authentication_credential)
         login_user(user)
+        session['used_webauthn'] = True
 
         next_ = request.args.get("next")
         if not next_ or not util.is_safe_url(next_):
@@ -186,3 +190,69 @@ def logout():
 @login_required
 def user_profile():
     return render_template("auth/user_profile.html")
+
+
+@auth.route("/email-login")
+def email_login():
+    """Request login by emailed link."""
+    user_uid = session.get("login_user_uid")
+    user = User.query.filter_by(uid=user_uid).first()
+
+    # This is probably impossible, but seems like useful protection
+    if not user:
+        res = make_response(
+            render_template(
+                "auth/_partials/username_form.html", error="No matching user found."
+            )
+        )
+        session.pop("login_user_uid", None)
+        return res
+    login_url = security.generate_magic_link(user.uid)
+    util.send_email(
+        user.email,
+        "Flask WebAuthn Login",
+        "Click or copy this link to log in. You must use the same browser that "
+        f"you were using when you requested to log in. {login_url}",
+    )
+    res = make_response(render_template("auth/_partials/email_login_message.html"))
+    res.set_cookie(
+        "magic_link_user_uid",
+        user.uid,
+        httponly=True,
+        secure=True,
+        samesite="strict",
+        max_age=datetime.timedelta(minutes=15),
+    )
+    return res
+
+
+@auth.route("/magic-link")
+def magic_link():
+    """Handle incoming magic link authentications."""
+    url_secret = request.args.get("secret")
+    user_uid = request.cookies.get("magic_link_user_uid")
+    user = User.query.filter_by(uid=user_uid).first()
+
+    if not user:
+        # TODO: this should probably flash some kind of message
+        return redirect(url_for("auth.login"))
+
+    if security.verify_magic_link(user_uid, url_secret):
+        login_user(user)
+        session['used_webauthn'] = False
+        return redirect(url_for("auth.user_profile"))
+
+    return redirect(url_for("auth.login"))
+
+
+@auth.route('/create-credential')
+@login_required
+def create_credential():
+    """Start creation of new credentials by existing users."""
+    pcco_json = security.prepare_credential_creation(current_user)
+    return make_response(
+        render_template(
+            "auth/_partials/register_credential.html",
+            public_credential_creation_options=pcco_json,
+        )
+    )

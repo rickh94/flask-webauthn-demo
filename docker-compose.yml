@@ -3,6 +3,8 @@ services:
   app:
     build:
       context: app
+    env_file:
+      - .env
     environment:
       DATABASE_URL: 'postgresql://databaseuser:supersecretdbpassword@db:5432/app'
       REDIS_HOST: redis
