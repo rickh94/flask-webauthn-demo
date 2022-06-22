@@ -1,4 +1,5 @@
 import os
+import uuid
 
 from flask import Flask, render_template
 from flask_login import LoginManager
@@ -33,6 +34,14 @@ app.register_blueprint(auth, url_prefix="/auth")
 @login_manager.user_loader
 def load_user(user_uid):
     return User.query.filter_by(uid=user_uid).first()
+
+
+@app.context_processor
+def utility_processor():
+    def random_id():
+        return uuid.uuid4().hex
+
+    return dict(random_id=random_id)
 
 
 @app.route("/")

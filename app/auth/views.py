@@ -9,6 +9,7 @@ from flask import (
     abort,
     url_for,
     redirect,
+    flash,
 )
 from flask_login import login_user, login_required, current_user, logout_user
 from sqlalchemy import or_, func
@@ -50,7 +51,7 @@ def create_user():
         )
 
     login_user(user)
-    session['used_webauthn'] = False
+    session["used_webauthn"] = False
 
     pcco_json = security.prepare_credential_creation(user)
     return make_response(
@@ -68,7 +69,8 @@ def add_credential():
     registration_credential = RegistrationCredential.parse_raw(request.get_data())
     try:
         security.verify_and_save_credential(current_user, registration_credential)
-        session['used_webauthn'] = True
+        session["used_webauthn"] = True
+        flash("Setup Complete!", "success")
 
         res = util.make_json_response(
             {"verified": True, "next": url_for("auth.user_profile")}
@@ -169,7 +171,8 @@ def verify_login_credential():
     try:
         security.verify_authentication_credential(user, authentication_credential)
         login_user(user)
-        session['used_webauthn'] = True
+        session["used_webauthn"] = True
+        flash("Login Complete", "success")
 
         next_ = request.args.get("next")
         if not next_ or not util.is_safe_url(next_):
@@ -183,6 +186,7 @@ def verify_login_credential():
 @login_required
 def logout():
     logout_user()
+    flash("Logged out", "success")
     return redirect(url_for("index"))
 
 
@@ -235,21 +239,24 @@ def magic_link():
 
     if not user:
         # TODO: this should probably flash some kind of message
+        flash("Could not log in. Please try again", "failure")
         return redirect(url_for("auth.login"))
 
     if security.verify_magic_link(user_uid, url_secret):
         login_user(user)
-        session['used_webauthn'] = False
+        session["used_webauthn"] = False
+        flash("Logged in", "success")
         return redirect(url_for("auth.user_profile"))
 
     return redirect(url_for("auth.login"))
 
 
-@auth.route('/create-credential')
+@auth.route("/create-credential")
 @login_required
 def create_credential():
     """Start creation of new credentials by existing users."""
     pcco_json = security.prepare_credential_creation(current_user)
+    flash("Click the button to start setup", "warning")
     return make_response(
         render_template(
             "auth/_partials/register_credential.html",
