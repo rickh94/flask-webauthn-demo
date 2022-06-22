@@ -9,3 +9,7 @@
 .font-work-sans {
     font-family: 'Work Sans', sans-serif;
 }
+
+input {
+    border-radius: 0;
+}

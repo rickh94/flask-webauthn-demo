@@ -27,7 +27,6 @@
     href="{{ url_for('static', filename='favicon-16x16.png') }}"
   >
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-  <link rel="manifest" href="/site.webmanifest">
   <!-- Load HTMX for some nice reactivity without much js --->
   <script src="https://unpkg.com/htmx.org@1.7.0"></script>
   <!-- Simple WebAuthn so I don't have to deal with it directly -->
@@ -96,16 +95,13 @@
           rel="noopener noreferrer"
         >
           <img
-            src="{{ url_for('static', filename='GitHub-mark-64px.png') }}"
+            src="{{ url_for('static', filename='GitHub-Mark-64px.png') }}"
             alt="GitHub Logo"
             class="h-6"
           >
           Website Source
         </a>
       </div>
-    </div>
-    <div class="text-black w-full text-center mt-2">
-      &#169; 2022 Rick Henry Development
     </div>
   </div>
 </footer>
