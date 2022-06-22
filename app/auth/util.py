@@ -32,11 +32,10 @@ def send_email(to, subject, body_text, body_html=None):
     if body_html:
         part2 = MIMEText(body_html, "html")
         message.attach(part2)
-    context = ssl.create_default_context()
     with smtplib.SMTP(
         current_app.config["MAIL_SERVER"], current_app.config["MAIL_PORT"]
     ) as server:
-        server.starttls(context=context)
+        server.starttls()
         server.login(
             current_app.config["MAIL_USERNAME"], current_app.config["MAIL_PASSWORD"]
         )

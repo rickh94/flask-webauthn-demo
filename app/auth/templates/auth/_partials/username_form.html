@@ -1,6 +1,16 @@
-<form hx-post="{{ url_for('auth.prepare_login') }}" hx-swap="outerHTML" class="max-w-sm mx-auto space-y-2">
+<form
+  hx-post="{{ url_for('auth.prepare_login') }}"
+  hx-swap="outerHTML"
+  class="max-w-sm mx-auto space-y-2"
+>
   <h1 class="text-xl font-bold mb-2">Login</h1>
-  <p class="italic">Enter your username or email address to start logging in.</p>
+  <p class="italic text-sm">Enter your username or email address.</p>
+  <p class="italic text-sm">If you don't have a username, you can start by
+    <a
+      href="{{ url_for('auth.register') }}"
+      class="font-bold text-indigo-500 hover:underline"
+    >registering</a>.
+  </p>
   {% if error %}
     <p class="text-red-700 font-bold">{{ error }}</p>
   {% endif %}
@@ -11,12 +21,12 @@
       id="username_email"
       name="username_email"
       required
-      class="border border-black rounded shadow p-1"
+      class="border-b-2 p-1 border-black bg-indigo-50 focus:bg-indigo-100  focus:outline-none focus:shadow"
     >
   </div>
   <div>
     <button
-      class="bg-green-600 font-bold py-2 px-4 uppercase shadow text-white rounded hover:bg-green-700 hover:shadow-lg"
+      class="bg-indigo-300 font-bold py-2 px-4 uppercase border-b-2 border-indigo-700 hover:bg-indigo-700 hover:text-white hover:shadow"
       type="submit"
     >Start Login
     </button>

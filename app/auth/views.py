@@ -212,11 +212,15 @@ def email_login():
         session.pop("login_user_uid", None)
         return res
     login_url = security.generate_magic_link(user.uid)
+    # TODO: make a template for an html version of the email.
     util.send_email(
         user.email,
         "Flask WebAuthn Login",
         "Click or copy this link to log in. You must use the same browser that "
         f"you were using when you requested to log in. {login_url}",
+        render_template(
+            "auth/email/login_email.html", username=user.username, login_url=login_url
+        ),
     )
     res = make_response(render_template("auth/_partials/email_login_message.html"))
     res.set_cookie(
@@ -238,7 +242,6 @@ def magic_link():
     user = User.query.filter_by(uid=user_uid).first()
 
     if not user:
-        # TODO: this should probably flash some kind of message
         flash("Could not log in. Please try again", "failure")
         return redirect(url_for("auth.login"))
 

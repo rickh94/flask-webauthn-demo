@@ -1,37 +1,43 @@
 {% extends "base.html" %}
 {% block content %}
-  <div class="flex flex-col space-y-4">
-    <h4 class="font-bold text-2xl">User Profile Information</h4>
-    <div>
-      <strong class="font-bold">Name:</strong> {{ current_user.name }}
-    </div>
-    <div>
-      <strong class="font-bold">Username:</strong> {{ current_user.username }}
-    </div>
-    <div>
-      <strong class="font-bold">Email:</strong> {{ current_user.email }}
-    </div>
-    <div>
-      <strong class="font-bold">UID:</strong> {{ current_user.uid }}
-    </div>
-    <div>
-      <strong class="font-bold">Registered
-        Credentials:</strong> {{ current_user.credentials | length }}
+  <div class="flex justify-center">
+  <div>
+    <h4 class="font-bold text-2xl mb-4">User Profile</h4>
+    <div class="flex bg-indigo-50 flex-col space-y-2 max-w-md mx-2 border border-black shadow p-4 mb-8">
+      <div>
+        <strong class="font-bold">Name:</strong> {{ current_user.name }}
+      </div>
+      <div>
+        <strong class="font-bold">Username:</strong> {{ current_user.username }}
+      </div>
+      <div>
+        <strong class="font-bold">Email:</strong> {{ current_user.email }}
+      </div>
+      <div>
+        <strong class="font-bold">UID:</strong> {{ current_user.uid }}
+      </div>
+      <div>
+        <strong class="font-bold">Registered
+          Credentials:</strong> {{ current_user.credentials | length }}
+      </div>
     </div>
     {% if not session.get("used_webauthn") %}
-      <div class="flex flex-col" id="webauthn_registration_section">
+      <div class="flex flex-col max-w-md" id="webauthn_registration_section">
+      <h2 class="text-2xl">Passwordless Authentication</h2>
         <p class="italic">It doesn't look like you have passwordless login set up on
           this device. If you plan on logging in from here in the future, you can set
           one up now. Only do this if you are using your own personal device.</p>
         <div class="mt-4">
-          <a
+          <button
             hx-get="{{ url_for('auth.create_credential') }}"
             hx-target="#webauthn_registration_section"
             hx-swap="innerHTML"
-            class="text-white uppercase font-bold bg-blue-600 px-4 py-2 rounded cursor-pointer hover:bg-blue-700 shadow hover:shadow-lg"
-          >Start Setup</a>
+            class="bg-indigo-300 font-bold py-2 px-4 uppercase border-b-2 border-indigo-700 hover:bg-indigo-700 hover:text-white hover:shadow"
+          >Start Setup</button>
         </div>
       </div>
     {% endif %}
   </div>
+  </div>
 {% endblock content %}
+{# TODO: investigate persisting click button notification #}

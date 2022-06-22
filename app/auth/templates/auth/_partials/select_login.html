@@ -2,6 +2,7 @@
 <p class="my-2">
   If you have logged in on this device before, you may be able to use a
   biometric method (Fingerprint Reader or Facial Recognition) or a security key.
+  Click "Device Login" to try this.
 </p>
 <p class="my-2">
   If you haven't logged in on this device before (or your device doesn't support
@@ -13,20 +14,20 @@
     hx-get="{{ url_for('auth.email_login') }}"
     hx-target="#page-content"
     hx-swap="innerHTML"
-    class="text-white uppercase font-bold bg-orange-600 cursor-pointer px-4 py-2 rounded"
+    class="cursor-pointer bg-orange-300 font-bold py-2 px-4 uppercase border-b-2 border-orange-600 hover:bg-orange-600 hover:text-white  hover:shadow"
   >
     Email Login
   </a>
 
   <button
-    class="text-white uppercase font-bold bg-green-600 px-4 py-2 rounded"
+    class="bg-indigo-300 font-bold py-2 px-4 uppercase border-b-2 border-indigo-700 hover:bg-indigo-700 hover:text-white hover:shadow"
     id="start-login"
   >
     Device Login
   </button>
   <a
     href="{{ url_for('auth.login_switch_user') }}"
-    class="text-white uppercase font-bold bg-black px-4 py-2 rounded"
+    class="bg-gray-300 font-bold py-2 px-4 uppercase border-b-2 border-black hover:bg-black hover:text-white hover:shadow"
   >
     Switch User
   </a>

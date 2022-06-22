@@ -9,66 +9,124 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Flask WebAuthn Demo</title>
 
-<!--  Quick and dirty tailwind to save some time on css -->
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="apple-touch-icon"
+    sizes="180x180"
+    href="{{ url_for('static', filename='apple-touch-icon.png') }}"
+  >
+  <link
+    rel="icon"
+    type="image/png"
+    sizes="32x32"
+    href="{{ url_for('static', filename='favicon-32x32.png') }}"
+  >
+  <link
+    rel="icon"
+    type="image/png"
+    sizes="16x16"
+    href="{{ url_for('static', filename='favicon-16x16.png') }}"
+  >
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <link rel="manifest" href="/site.webmanifest">
   <!-- Load HTMX for some nice reactivity without much js --->
   <script src="https://unpkg.com/htmx.org@1.7.0"></script>
   <!-- Simple WebAuthn so I don't have to deal with it directly -->
   <script src="https://unpkg.com/@simplewebauthn/browser/dist/bundle/index.umd.min.js"></script>
   <script>
-    const { startRegistration, startAuthentication } = SimpleWebAuthnBrowser;
+      const {startRegistration, startAuthentication} = SimpleWebAuthnBrowser;
   </script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='fonts.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
 </head>
-<body>
+<body hx-boost="true">
 
 <!-- navbar -->
-<header class="w-full bg-gray-50 font-bold px-8 py-2 flex justify-between shadow items-center">
-  <a href="{{ url_for('index') }}" class="font-bold text-2xl">WebAuthn Flask</a>
-  <nav class="flex justify-end space-x-4 items-center">
+<header class="font-merriweather w-full bg-indigo-400 border-b-2 border-indigo-800 font-bold px-4 py-2 flex justify-between items-center">
+  <a href="{{ url_for('index') }}" class="font-bold text-2xl pt-1">WebAuthn Flask</a>
+  <nav class="flex justify-end space-x-4 items-center pt-1">
     {% if current_user.is_authenticated %}
       <div>
-        <a href="{{ url_for('auth.user_profile') }}" class="hover:underline font-bold text-xl">Profile</a>
+        <a
+          href="{{ url_for('auth.user_profile') }}"
+          class="hover:underline font-bold text-xl"
+        >Profile</a>
       </div>
       <div>
-        <a href="{{ url_for('auth.logout') }}" class="hover:underline font-bold text-xl">Logout</a>
+        <a
+          href="{{ url_for('auth.logout') }}"
+          class="hover:underline font-bold text-xl"
+        >Logout</a>
       </div>
     {% else %}
-    <div>
-      <a href="{{ url_for('auth.login') }}" class="hover:underline font-bold text-xl">Login</a>
-    </div>
-    <div>
-      <a href="{{ url_for('auth.register') }}" class="hover:underline font-bold text-xl">Register</a>
-    </div>
+      <div>
+        <a href="{{ url_for('auth.login') }}" class="hover:underline font-bold text-xl">Login</a>
+      </div>
+      <div>
+        <a
+          href="{{ url_for('auth.register') }}"
+          class="hover:underline font-bold text-xl"
+        >Register</a>
+      </div>
     {% endif %}
   </nav>
 </header>
 
 <!-- main content -->
-<main class="mt-8 max-w-4xl mx-auto px-2" id="page-content">
+<main class="mt-8 max-w-4xl mx-auto px-2 font-work-sans h-screen" id="page-content">
   {% block content %}
   {% endblock %}
 </main>
 
 {% include "_partials/toasts.html" %}
 
+<footer class="w-full py-4 px-4">
+  <div class="max-w-md md:max-w-4xl mx-auto w-full">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+      <div class="flex justify-center items-center">
+        <a href="https://rickhenry.dev">
+          <img src="{{ url_for('static', filename='logo-nobackground-1000.png') }}" alt="Rick Henry Development Logo" class="h-32 w-auto">
+        </a>
+      </div>
+      <div class="flex justify-center items-center">
+        <a
+          class="block text-black justify-center flex gap-2 hover:underline focus:font-bold focus:outline-none focus:underline"
+          href="https://github.com/rickh94/flask-webauthn-demo"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <img
+            src="{{ url_for('static', filename='GitHub-mark-64px.png') }}"
+            alt="GitHub Logo"
+            class="h-6"
+          >
+          Website Source
+        </a>
+      </div>
+    </div>
+    <div class="text-black w-full text-center mt-2">
+      &#169; 2022 Rick Henry Development
+    </div>
+  </div>
+</footer>
 </body>
 {% block script %}
 {% endblock script %}
 <script>
-  function removeMessages() {
+    function removeMessages() {
 
-    <!--    Remove all flashed messages after 5 seconds -->
-    const messages = document.querySelectorAll('.flashed-message')
-    console.log(messages)
-    setTimeout(function () {
-      for (let message of messages) {
-        console.log('removing message', message)
-        message.remove();
-      }
-    }, 5000)
-  }
+        <!--    Remove all flashed messages after 5 seconds -->
+        const messages = document.querySelectorAll('.flashed-message')
+        console.log(messages)
+        setTimeout(function () {
+            for (let message of messages) {
+                console.log('removing message', message)
+                message.remove();
+            }
+        }, 5000)
+    }
 
-  document.addEventListener("DOMContentLoaded", removeMessages)
-  document.addEventListener("htmx:afterSettle", removeMessages)
+    document.addEventListener("DOMContentLoaded", removeMessages)
+    document.addEventListener("htmx:afterSettle", removeMessages)
 </script>
 </html>

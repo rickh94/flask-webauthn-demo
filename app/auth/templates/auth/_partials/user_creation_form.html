@@ -1,6 +1,6 @@
 <form hx-post="{{ url_for('auth.create_user') }}" hx-swap="outerHTML" class="max-w-sm mx-auto space-y-2">
   <h4 class="text-2xl font-bold">Register</h4>
-  <p class="italic text-base">
+  <p class="italic text-sm">
     Create your user account below. We will set up authentication in the next
     step.
   </p>
@@ -13,7 +13,7 @@
       type="text"
       name="name"
       id="name"
-      class="border border-black rounded shadow p-1"
+      class="border-b-2 p-1 border-black bg-indigo-50 focus:bg-indigo-100 focus:outline-none focus:shadow"
     >
   </div>
   <div class="flex-col flex mt-2">
@@ -22,7 +22,7 @@
       type="text"
       name="username"
       id="username"
-      class="border border-black rounded shadow p-1"
+      class="border-b-2 p-1 border-black bg-indigo-50 focus:bg-indigo-100  focus:outline-none focus:shadow"
       required
     >
   </div>
@@ -32,13 +32,13 @@
       type="email"
       name="email"
       id="email"
-      class="border border-black rounded shadow p-1"
+      class="border-b-2 p-1 border-black bg-indigo-50 focus:bg-indigo-100 focus:outline-none focus:shadow"
       required
     >
   </div>
-  <div>
+  <div class="flex justify-end">
     <button
-      class="bg-green-600 font-bold py-2 px-4 uppercase shadow text-white rounded hover:bg-green-700 hover:shadow-lg"
+      class="bg-indigo-300 font-bold py-2 px-4 uppercase border-b-2 border-indigo-700 hover:bg-indigo-700 hover:text-white hover:shadow"
       type="submit"
     >
       Register

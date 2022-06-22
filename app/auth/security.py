@@ -12,19 +12,18 @@ from webauthn.helpers.structs import PublicKeyCredentialDescriptor
 
 from models import WebAuthnCredential, db
 
-REDIS_HOST = os.getenv("REDIS_HOST")
-REDIS_PORT = os.getenv("REDIS_PORT")
-REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
 
-REGISTRATION_CHALLENGES = Redis(
-    host=REDIS_HOST, port=REDIS_PORT, db=0, password=REDIS_PASSWORD
-)
-AUTHENTICATION_CHALLENGES = Redis(
-    host=REDIS_HOST, port=REDIS_PORT, db=1, password=REDIS_PASSWORD
-)
-EMAIL_AUTH_SECRETS = Redis(
-    host=REDIS_HOST, port=REDIS_PORT, db=2, password=REDIS_PASSWORD
-)
+if redis_url := os.getenv("REDIS_URL"):
+    REGISTRATION_CHALLENGES = Redis.from_url(f"{redis_url}/0")
+    AUTHENTICATION_CHALLENGES = Redis.from_url(f"{redis_url}/1")
+    EMAIL_AUTH_SECRETS = Redis.from_url(f"{redis_url}/2")
+else:
+    rh = os.getenv("REDIS_HOST")
+    rpass = os.getenv("REDIS_PASSWORD")
+    rport = int(os.getenv("REDIS_PORT"))
+    REGISTRATION_CHALLENGES = Redis(host=rh, port=rport, password=rpass, db=0)
+    AUTHENTICATION_CHALLENGES = Redis(host=rh, port=rport, password=rpass, db=1)
+    EMAIL_AUTH_SECRETS = Redis(host=rh, port=rport, password=rpass, db=2)
 
 
 def _hostname():
@@ -116,7 +115,7 @@ def verify_authentication_credential(user, authentication_credential):
         expected_origin=f"https://{_hostname()}",
         expected_rp_id=_hostname(),
         credential_public_key=stored_credential.credential_public_key,
-        credential_current_sign_count=0
+        credential_current_sign_count=0,
     )
     AUTHENTICATION_CHALLENGES.expire(user.uid, datetime.timedelta(seconds=1))
 
@@ -136,7 +135,9 @@ def generate_magic_link(user_uid):
     secret_hash = ph.hash(url_secret)
     EMAIL_AUTH_SECRETS.set(user_uid, secret_hash)
     EMAIL_AUTH_SECRETS.expire(user_uid, datetime.timedelta(minutes=10))
-    return url_for("auth.magic_link", secret=url_secret, _external=True, _scheme="https")
+    return url_for(
+        "auth.magic_link", secret=url_secret, _external=True, _scheme="https"
+    )
 
 
 def verify_magic_link(user_uid, secret):

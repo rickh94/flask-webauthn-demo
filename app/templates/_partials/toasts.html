@@ -1,18 +1,30 @@
+{# TODO: restyle to match squared edges and borders. Move below navbar. #}
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
-<div class="absolute top-5 right-5 flex flex-col">
+<div class="absolute top-16 right-5 flex flex-col">
   {% for category, message in messages %}
   {% set message_id %}message-{{ random_id() }}{% endset %}
+  {% set border_shadow_color %}
+  {% if category == "success" %}
+    border-green-500 shadow-green-100
+  {% elif category == "warning" %}
+    border-yellow-500 shadow-yellow-100
+  {% elif category == "failure" %}
+    border-red-500 shadow-red-100
+  {% else %}
+    border-black
+  {% endif %}
+  {% endset %}
   <div
-    class="flashed-message flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow"
+    class="flashed-message flex items-center w-full max-w-xs mb-4 text-black bg-white border-2 {{ border_shadow_color }} shadow"
     id="{{ message_id }}"
     role="alert"
   >
     <!-- icon selected by category -->
     {% if category == "success" %}
-      <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
+      <div class="flex items-center justify-center flex-shrink-0 w-10 h-10 text-green-500 bg-green-100">
         <svg
-          class="w-5 h-5"
+          class="w-6 h-6"
           fill="currentColor"
           viewBox="0 0 20 20"
           xmlns="http://www.w3.org/2000/svg"
@@ -25,9 +37,9 @@
         </svg>
       </div>
     {% elif category == "warning" %}
-      <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-orange-500 bg-orange-100 rounded-lg dark:bg-orange-700 dark:text-orange-200">
+      <div class="flex items-center justify-center flex-shrink-0 w-10 h-10 text-orange-500 bg-orange-100">
         <svg
-          class="w-5 h-5"
+          class="w-8 h-8"
           fill="currentColor"
           viewBox="0 0 20 20"
           xmlns="http://www.w3.org/2000/svg"
@@ -40,7 +52,7 @@
         </svg>
       </div>
     {% elif category == "failure" %}
-      <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
+      <div class="flex items-center justify-center flex-shrink-0 w-10 h-10 text-red-500 bg-red-100">
         <svg
           class="w-5 h-5"
           fill="currentColor"
@@ -56,11 +68,11 @@
       </div>
     {% endif %}
     <!-- message text -->
-    <div class="ml-3 text-sm font-normal">{{ message }}</div>
+    <div class="mx-3 text-sm font-normal">{{ message }}</div>
     <!-- close button -->
     <button
       type="button"
-      class="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:text-gray-500 dark:hover:text-white dark:bg-gray-800 dark:hover:bg-gray-700"
+      class="ml-auto bg-white text-gray-700 hover:text-gray-100 hover:bg-gray-700 focus:ring-2 focus:ring-gray-300 inline-flex h-10 w-10 flex items-center justify-center"
       aria-label="Close"
       onclick="document.getElementById('{{ message_id }}').remove()"
     >

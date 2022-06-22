@@ -1,7 +1,7 @@
 import os
 import uuid
 
-from flask import Flask, render_template
+from flask import Flask, render_template, flash
 from flask_login import LoginManager
 from flask_migrate import Migrate
 
