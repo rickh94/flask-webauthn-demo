@@ -4,6 +4,7 @@ import os
 import secrets
 from urllib.parse import urlparse
 
+import argon2.exceptions
 import webauthn
 from argon2 import PasswordHasher
 from flask import request, url_for
@@ -44,7 +45,7 @@ def prepare_credential_creation(user):
     REGISTRATION_CHALLENGES.set(user.uid, public_credential_creation_options.challenge)
     REGISTRATION_CHALLENGES.expire(user.uid, datetime.timedelta(minutes=10))
 
-    return webauthn.options_to_json(public_credential_creation_options)
+    return json.loads(webauthn.options_to_json(public_credential_creation_options))
 
 
 def verify_and_save_credential(user, registration_credential):
@@ -144,7 +145,10 @@ def verify_magic_link(user_uid, secret):
     """Verify the secret from a magic login link against the saved hash for that
     user."""
     secret_hash = EMAIL_AUTH_SECRETS.get(user_uid)
-    if ph.verify(secret_hash, secret):
-        EMAIL_AUTH_SECRETS.expire(user_uid, datetime.timedelta(seconds=1))
-        return True
+    try:
+        if ph.verify(secret_hash, secret):
+            EMAIL_AUTH_SECRETS.expire(user_uid, datetime.timedelta(seconds=1))
+            return True
+    except argon2.exceptions.VerifyMismatchError:
+        return False
     return False

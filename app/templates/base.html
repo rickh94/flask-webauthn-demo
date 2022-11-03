@@ -116,7 +116,7 @@
         console.log(messages)
         setTimeout(function () {
             for (let message of messages) {
-                console.log('removing message', message)
+                {#console.log('removing message', message)#}
                 message.remove();
             }
         }, 5000)

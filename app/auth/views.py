@@ -1,4 +1,6 @@
 import datetime
+import json
+import logging
 
 from flask import (
     Blueprint,
@@ -53,11 +55,11 @@ def create_user():
     login_user(user)
     session["used_webauthn"] = False
 
-    pcco_json = security.prepare_credential_creation(user)
+    pcco = security.prepare_credential_creation(user)
     return make_response(
         render_template(
             "auth/_partials/register_credential.html",
-            public_credential_creation_options=pcco_json,
+            public_credential_creation_options=pcco,
         )
     )
 
@@ -258,11 +260,13 @@ def magic_link():
 @login_required
 def create_credential():
     """Start creation of new credentials by existing users."""
-    pcco_json = security.prepare_credential_creation(current_user)
-    flash("Click the button to start setup", "warning")
+    pcco = security.prepare_credential_creation(current_user)
+    # flash("Click the button to start setup", "warning")
     return make_response(
         render_template(
             "auth/_partials/register_credential.html",
-            public_credential_creation_options=pcco_json,
+            public_credential_creation_options=pcco,
         )
     )
+
+    # TODO: create a route to revoke all credentials

@@ -12,6 +12,7 @@ services:
       REDIS_PORT: 6379
       REDIS_PASSWORD: 'supersecretredispassword'
       SECRET_KEY: 'supersecretrandomkeythatsreallysecure'
+    platform: linux/amd64
     volumes:
       - ./app:/app
     ports:

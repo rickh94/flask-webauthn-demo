@@ -33,10 +33,18 @@
   </a>
 </div>
 
+<script id="auth-options" type="application/json">
+  {{ auth_options | tojson }}
+</script>
+<script id="script-data"
+        data-verify-url="{{ url_for('auth.verify_login_credential') }}"
+></script>
 <script>
+    const scriptData = document.getElementById('script-data').dataset;
+
     document.getElementById('start-login').addEventListener('click', async () => {
         // The auth_options dictionary is also a valid javascript object, so it can be injected here.
-        const options = {{ auth_options | safe }};
+        const options = JSON.parse(document.getElementById('auth-options').textContent);
 
         let asseResp;
         try {
@@ -46,7 +54,7 @@
             console.error(error)
         }
 
-        const verificationResp = await fetch('{{ url_for("auth.verify_login_credential") }}', {
+        const verificationResp = await fetch(scriptData.verifyUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
