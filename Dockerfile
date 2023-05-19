@@ -1,1 +1,0 @@
-# Dummy dockerfile to convince dokku to use the docker mode
